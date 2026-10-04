@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ការពិសោធន៍សម្ពាធ (Quiz 1)</title>
+    <script>MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        body { font-family: 'Hanuman', 'Siemreap', Arial, sans-serif; background-color: #f4f6f9; padding: 20px; color: #111; text-align: center; margin: 0; }
+        .tab-container { display: flex; justify-content: center; margin-bottom: 20px; background: #1e293b; padding: 10px; border-radius: 8px; max-width: 980px; margin: 0 auto 20px;}
+        .tab-btn { background: #334155; color: #cbd5e1; border: none; padding: 10px 20px; margin: 0 5px; font-size: 16px; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: inherit; font-weight: bold;}
+        .tab-btn.active { background: #38bdf8; color: #0f172a; }
+        .tab-btn.quiz-active { background: #2ecc71; color: white; }
+        .tab-content { display: none; max-width: 980px; margin: 0 auto; }
+        .tab-content.active { display: block; }
+        
+        /* Sim Styles */
+        .problem-statement { background: #fff3cd; color: #664d03; padding: 18px 25px; border-radius: 8px; border-left: 6px solid #ffc107; text-align: left; margin-bottom: 20px; font-size: 17px; font-weight: bold; line-height: 1.8; box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
+        .sim-area { position: relative; width: 100%; max-width: 500px; background: #e0f7fa; border: 2px solid #ced4da; border-radius: 8px; overflow: hidden; margin: 0 auto 20px; display: block; }
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .slider-box { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-weight: bold; text-align: left; }
+        input[type=range] { width: 100%; margin-top: 10px; cursor: pointer; }
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .data-box { background: white; padding: 12px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.12); text-align: center; font-size: 14px; font-weight: bold; color: #333; }
+        .data-box span { font-weight: 900; font-size: 20px; display: block; margin-top: 8px; }
+        #liveFup { color: #28a745; } #liveFdown { color: #6f42c1; } #liveStatus { color: #007bff; font-size: 20px;} #liveHc { color: #e65100; }
+        .solution-box { background: #e2e8f0; padding: 25px; border-radius: 8px; text-align: left; margin-top: 25px; border-left: 6px solid #4a5568; font-size: 17px; line-height: 1.8; overflow-x: auto; }
+        .solution-box h3 { margin-top: 0; color: #2d3748; border-bottom: 2px solid #cbd5e0; padding-bottom: 10px;}
+        .note-box { background: #e8f5e9; border-left: 6px solid #28a745; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #1b5e20; }
+        
+        /* Quiz Styles */
+        #quiz-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
+        .student-info { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .student-info select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-family: inherit; font-size: 16px;}
+        .question-block { background: #fdfbfb; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 15px; border-radius: 5px; }
+        .question-block p { font-weight: bold; margin-top: 0; }
+        .question-block label { display: block; margin-bottom: 8px; cursor: pointer; padding: 5px;}
+        .question-block label:hover {background: #e2e8f0; border-radius: 4px;}
+        .submit-btn { background: #2ecc71; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; font-family: inherit;}
+        .submit-btn:hover { background: #27ae60; }
+        
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; text-align: center; width: 90%; max-width: 400px; }
+        .modal-box h3 { color: #2ecc71; margin-top: 0;}
+        .modal-btn { background: #3498db; color: white; border: none; padding: 10px 30px; font-size: 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight:bold;}
+    </style>
+</head>
+<body>
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="openTab(event, 'sim-tab')">១. ការពិសោធន៍សម្ពាធ</button>
+        <button class="tab-btn" onclick="openTab(event, 'quiz-tab')">២. កម្រងសំណួរ (Quiz ១)</button>
+    </div>
+
+    <!-- ផ្នែកទី១: ពិសោធន៍ -->
+    <div id="sim-tab" class="tab-content active">
+        <div class="problem-statement">
+            <strong>ការពិសោធន៍៖</strong> គេយកបន្ទះលោហៈតូចមួយ (ម៉ាស $m_1$) មកដាក់បិទមាត់បំពង់កែវ (ផ្ទៃមុខកាត់ $A$) រួចសង្កត់បញ្ចុះទៅក្នុងទឹកឱ្យបានជម្រៅ $h$។ បន្ទាប់មក គេទម្លាក់ដុំទម្ងន់បន្ថែម (ម៉ាស $m_2$) ចូល។ តើនៅជម្រៅណាដែលបន្ទះនោះរបូតធ្លាក់?
+        </div>
+        <div class="sim-area">
+            <svg viewBox="0 0 500 600" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <linearGradient id="waterBody" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0288d1" stop-opacity="0.8"/><stop offset="50%" stop-color="#4fc3f7" stop-opacity="0.6"/><stop offset="100%" stop-color="#01579b" stop-opacity="0.85"/></linearGradient>
+                    <linearGradient id="tankBody" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#cfd8dc" stop-opacity="0.5"/><stop offset="50%" stop-color="#ffffff" stop-opacity="0.2"/><stop offset="100%" stop-color="#90a4ae" stop-opacity="0.6"/></linearGradient>
+                    <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#eceff1" stop-opacity="0.6"/><stop offset="100%" stop-color="#b0bec5" stop-opacity="0.6"/></linearGradient>
+                </defs>
+                <path d="M 80 180 A 170 25 0 0 1 420 180" fill="none" stroke="#546e7a" stroke-width="4" opacity="0.4" />
+                <path d="M 80 180 L 80 550 A 170 25 0 0 0 420 550 L 420 180" fill="url(#tankBody)" stroke="#546e7a" stroke-width="4" />
+                <path d="M 82 250 L 82 550 A 168 23 0 0 0 418 550 L 418 250 Z" fill="url(#waterBody)" />
+                <line x1="60" y1="250" x2="70" y2="250" stroke="#333" stroke-width="2" /><text x="45" y="255" font-family="Arial" font-size="12">0</text>
+                <line x1="60" y1="350" x2="70" y2="350" stroke="#333" stroke-width="2" /><text x="40" y="355" font-family="Arial" font-size="12">10</text>
+                <line x1="60" y1="450" x2="70" y2="450" stroke="#333" stroke-width="2" /><text x="40" y="455" font-family="Arial" font-size="12">20</text>
+                <line x1="60" y1="550" x2="70" y2="550" stroke="#333" stroke-width="2" /><text x="40" y="555" font-family="Arial" font-size="12">30</text>
+                <text x="35" y="235" font-family="Arial" font-size="12" font-weight="bold">cm</text>
+                <g id="tubeGroup" transform="translate(0, 0)">
+                    <ellipse id="tubeTopEl" cx="250" cy="50" rx="40" ry="10" fill="none" stroke="#607d8b" stroke-width="2" />
+                    <path id="tubeBody" d="M 210 50 L 210 400 A 40 10 0 0 0 290 400 L 290 50 Z" fill="url(#tubeGrad)" stroke="#607d8b" stroke-width="2" />
+                </g>
+                <g id="plateGroup" transform="translate(0, 0)">
+                    <ellipse id="plateEl" cx="250" cy="400" rx="42" ry="12" fill="#ffb300" stroke="#f57f17" stroke-width="3" />
+                    <g id="addedMassGroup" style="opacity: 0;">
+                        <rect id="m2Body" x="235" y="375" width="30" height="25" fill="#f44336" stroke="#c62828" stroke-width="2" rx="3" />
+                        <text id="txtM2" x="250" y="392" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="12" fill="#fff">m₂</text>
+                    </g>
+                    <line id="vecFdown" x1="250" y1="410" x2="250" y2="480" stroke="#6f42c1" stroke-width="4" />
+                    <polygon id="headFdown" points="245,480 255,480 250,490" fill="#6f42c1" />
+                    <line id="vecFup" x1="250" y1="410" x2="250" y2="340" stroke="#28a745" stroke-width="4" />
+                    <polygon id="headFup" points="245,340 255,340 250,330" fill="#28a745" />
+                </g>
+                <ellipse cx="250" cy="250" rx="168" ry="23" fill="#81d4fa" opacity="0.8" />
+                <path d="M 80 180 A 170 25 0 0 0 420 180" fill="none" stroke="#546e7a" stroke-width="4" />
+                <g id="hMeasureGroup">
+                    <line id="hStart" x1="160" y1="250" x2="200" y2="250" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,5" />
+                    <line id="hEnd" x1="160" y1="400" x2="200" y2="400" stroke="#d32f2f" stroke-width="2" stroke-dasharray="5,5" />
+                    <line id="hLine" x1="180" y1="250" x2="180" y2="400" stroke="#d32f2f" stroke-width="2" />
+                    <polygon id="hArrTop" points="176,260 184,260 180,250" fill="#d32f2f" />
+                    <polygon id="hArrBot" points="176,390 184,390 180,400" fill="#d32f2f" />
+                    <text id="lblH" x="155" y="325" font-family="Arial" font-weight="bold" font-size="18" fill="#d32f2f" text-anchor="end">h</text>
+                </g>
+            </svg>
+        </div>
+        <div class="controls-grid">
+            <div class="slider-box">ជម្រៅបំពង់ក្នុងទឹក ($h$) cm:<br><span id="valH" style="color: #d32f2f; font-size:22px;">15.0</span> cm<input type="range" id="sliderH" min="1.0" max="28.0" value="15.0" step="0.5"></div>
+            <div class="slider-box">ផ្ទៃមុខកាត់បំពង់ ($A$) cm&sup2;:<br><span id="valA" style="color: #007bff; font-size:22px;">20.0</span> cm&sup2;<input type="range" id="sliderA" min="10.0" max="60.0" value="20.0" step="1.0"></div>
+            <div class="slider-box">ម៉ាសបន្ទះបាត ($m_1$) g:<br><span id="valM1" style="color: #6f42c1; font-size:22px;">40</span> g<input type="range" id="sliderM1" min="5" max="150" value="40" step="5"></div>
+            <div class="slider-box">ម៉ាសទម្ងន់បន្ថែម ($m_2$) g:<br><span id="valM2" style="color: #e65100; font-size:22px;">0</span> g<input type="range" id="sliderM2" min="0" max="300" value="0" step="10"></div>
+        </div>
+        <div class="dashboard">
+            <div class="data-box" style="border-top: 4px solid #28a745;">កម្លាំងរុញពីទឹក ($F_{up}$)<br><span id="liveFup">0.29 N</span></div>
+            <div class="data-box" style="border-top: 4px solid #6f42c1;">កម្លាំងទាញចុះ ($F_{down}$)<br><span id="liveFdown">0.39 N</span></div>
+            <div class="data-box" style="border-top: 4px solid #e65100;">ជម្រៅលំនឹង ($h_c$)<br><span id="liveHc">2.0 cm</span></div>
+            <div class="data-box" style="border-top: 4px solid #007bff;">ស្ថានភាពបន្ទះ<br><span id="liveStatus">ជាប់នឹងបំពង់</span></div>
+        </div>
+        <div class="solution-box">
+            <div class="note-box" id="theoryNote">💡 <strong>ការវិភាគ៖</strong> កាលណា $F_{down} > F_{up}$ នោះបន្ទះនឹងរបូតធ្លាក់។</div>
+            <div id="mathContainer">
+                <div id="mathLine3">$$ F_{down} = (m_1 + m_2)g = (0.040 + 0) \times 9.80 = 0.39 \text{ N} $$</div>
+                <div id="mathLine4">$$ F_{up} = \rho g h A = 1000 \times 9.80 \times 0.15 \times 0.0020 = 2.94 \text{ N} $$</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ផ្នែកទី២: Quiz -->
+    <div id="quiz-tab" class="tab-content">
+        <div id="quiz-container">
+            <h2 style="text-align: center; color: #2c3e50;">កម្រងសំណួរតេស្តសមត្ថភាព៖ សម្ពាធក្នុងអង្គធាតុរាវ (៥០ ពិន្ទុ)</h2>
+            <div class="student-info">
+                <label><b>ជ្រើសរើសថ្នាក់៖</b></label>
+                <select id="classSelect" onchange="updateStudentList()"><option value="G10A">ថ្នាក់ទី ១០A</option><option value="G10B">ថ្នាក់ទី ១០B</option></select>
+                <label><b>ជ្រើសរើសឈ្មោះ៖</b></label>
+                <select id="nameSelect"></select>
+            </div>
+            
+            <div class="question-block">
+                <p>១. តើបន្ទះលោហៈនឹងរបូតធ្លាក់នៅពេលណា?</p>
+                <label><input type="radio" name="q1" value="0"> ក. នៅពេលកម្លាំងរុញពីទឹកធំជាងទម្ងន់បន្ទះ</label>
+                <label><input type="radio" name="q1" value="10"> ខ. នៅពេលទម្ងន់សរុបចុះក្រោមធំជាងកម្លាំងរុញពីទឹក</label>
+                <label><input type="radio" name="q1" value="0"> គ. នៅពេលជម្រៅ $h$ កាន់តែជ្រៅ</label>
+            </div>
+            <div class="question-block">
+                <p>២. តើកម្លាំងរុញពីទឹក $F_{up}$ អាស្រ័យលើកត្តាអ្វីខ្លះ?</p>
+                <label><input type="radio" name="q2" value="0"> ក. ម៉ាសបន្ទះ និងម៉ាសមាឌទឹក</label>
+                <label><input type="radio" name="q2" value="10"> ខ. ម៉ាសមាឌទឹក ជម្រៅ $h$ និងផ្ទៃមុខកាត់ $A$</label>
+                <label><input type="radio" name="q2" value="0"> គ. ទម្ងន់បន្ថែម $m_2$ តែមួយគត់</label>
+            </div>
+            <div class="question-block">
+                <p>៣. ប្រសិនបើគេបង្កើនផ្ទៃមុខកាត់ $A$ ធំជាងមុន ៣ដង តើនឹងមានអ្វីកើតឡើង?</p>
+                <label><input type="radio" name="q3" value="10"> ក. កម្លាំងរុញពីទឹកកើនឡើង ៣ដង ធ្វើឱ្យបន្ទះកាន់តែជាប់កែវ</label>
+                <label><input type="radio" name="q3" value="0"> ខ. កម្លាំងរុញពីទឹកថយចុះ ៣ដង</label>
+                <label><input type="radio" name="q3" value="0"> គ. បន្ទះនឹងរបូតធ្លាក់ភ្លាមៗ</label>
+            </div>
+            <div class="question-block">
+                <p>៤. រូបមន្តសម្រាប់គណនាកម្លាំងរុញពីទឹកគឺអ្វី?</p>
+                <label><input type="radio" name="q4" value="10"> ក. $F_{up} = \rho \cdot g \cdot h \cdot A$</label>
+                <label><input type="radio" name="q4" value="0"> ខ. $F_{up} = m \cdot g \cdot h$</label>
+                <label><input type="radio" name="q4" value="0"> គ. $F_{up} = \frac{\rho \cdot g}{A}$</label>
+            </div>
+            <div class="question-block">
+                <p>៥. តើជម្រៅលំនឹង $h_c$ គឺជារបស់អ្វី?</p>
+                <label><input type="radio" name="q5" value="0"> ក. ជម្រៅអតិបរមាដែលបំពង់អាចចុះបាន</label>
+                <label><input type="radio" name="q5" value="10"> ខ. ជម្រៅដែលកម្លាំងរុញពីទឹក និងទម្ងន់ទាញចុះមានទំហំស្មើគ្នា</label>
+                <label><input type="radio" name="q5" value="0"> គ. ជម្រៅនៅពេលបន្ទះបែកបាក់</label>
+            </div>
+            <button class="submit-btn" onclick="submitQuiz()">បញ្ជូនចម្លើយទៅកាន់គ្រូ</button>
+        </div>
+    </div>
+
+    <!-- លាក់ឈ្មោះសិស្សពី CSV 10A & 10B -->
+    <div id="names-10A" style="display: none;">
+        <option value="អេង  សុវណ្ណថារី">អេង  សុវណ្ណថារី</option><option value="ហេង  ច័ន្ទអាយនីង">ហេង  ច័ន្ទអាយនីង</option><option value="ប៊ុន  ខត្តិយាវតី">ប៊ុន  ខត្តិយាវតី</option><option value="ប៉ាក  ច័ន្ទដាវីត">ប៉ាក  ច័ន្ទដាវីត</option><option value="អ៊ីវ  សុគន្ធបរមី">អ៊ីវ  សុគន្ធបរមី</option><option value="ភូ  លីណា">ភូ  លីណា</option><option value="ពន្លឺ  ពេជ្រចាន់ពិសិដ្ឋ">ពន្លឺ  ពេជ្រចាន់ពិសិដ្ឋ</option><option value="ប៉ុន  សុវណ្ណា">ប៉ុន  សុវណ្ណា</option><option value="ប៉ុន  សុវណ្ណលី">ប៉ុន  សុវណ្ណលី</option><option value="ភូ  សុគន្ធរ័ត្ន">ភូ  សុគន្ធរ័ត្ន</option><option value="ឡាយ  ស៊ុនអាន">ឡាយ  ស៊ុនអាន</option><option value="នួន  នីណា">នួន  នីណា</option><option value="ង៉ែត  សុគន្ធរក្សា">ង៉ែត  សុគន្ធរក្សា</option><option value="ហុក  គីមស៊ាន់">ហុក  គីមស៊ាន់</option><option value="សៀន  ពិសិដ្ឋ">សៀន  ពិសិដ្ឋ</option><option value="លី  សុរក្សា">លី  សុរក្សា</option><option value="គង់  ភារ៉ា">គង់  ភារ៉ា</option><option value="ខន  ស្រីនុត">ខន  ស្រីនុត</option><option value="រិទ្ធ  ទេវរបុត្រ">រិទ្ធ  ទេវរបុត្រ</option><option value="រាជ  បញ្ញាស័ក្តិ">រាជ  បញ្ញាស័ក្តិ</option><option value="គង់  សំរិទ្ធម៉ីលីង">គង់  សំរិទ្ធម៉ីលីង</option><option value="ស៊ី  អ៊ុយហុង">ស៊ី  អ៊ុយហុង</option><option value="សុខា  ម៉ានិច">សុខា  ម៉ានិច</option><option value="ផាត  សុវណ្ណវឌ្ឍនា">ផាត  សុវណ្ណវឌ្ឍនា</option><option value="ប៉ែន  សុខមាន">ប៉ែន  សុខមាន</option><option value="ឆេង  ឡុងហ៊ូន">ឆេង  ឡុងហ៊ូន</option><option value="គុយ  សុធីរាវិសិដ្ឋនាថ">គុយ  សុធីរាវិសិដ្ឋនាថ</option><option value="ម៉ៅ  ស្រីហេង">ម៉ៅ  ស្រីហេង</option><option value="ញ៉ុន  សំភី">ញ៉ុន  សំភី</option><option value="យ៉េត  ចន្ទចេស្តា">យ៉េត  ចន្ទចេស្តា</option>
+    </div>
+    <div id="names-10B" style="display: none;">
+        <option value="លីម​  នូស៊ីម">លីម​  នូស៊ីម</option><option value="មុន្នី  ករុណា">មុន្នី  ករុណា</option><option value="សុវណ្ណ  អាលីហ្សា">សុវណ្ណ  អាលីហ្សា</option><option value="ង៉ែត  ប៊ុនហ៊ួត">ង៉ែត  ប៊ុនហ៊ួត</option><option value="ហង្ស  ពេជ្រពិសី">ហង្ស  ពេជ្រពិសី</option><option value="ស៊ឹង សុវណ្ណរាជ្យ">ស៊ឹង សុវណ្ណរាជ្យ</option><option value="សម  សុបញ្ញា">សម  សុបញ្ញា</option><option value="វិន  សិលា">វិន  សិលា</option><option value="ធា  ណារី">ធា  ណារី</option><option value="សុខ  ពន្លឺ">សុខ  ពន្លឺ</option><option value="រុន  រស្មី">រុន  រស្មី</option><option value="ខូវ  ឡាយអ៊ូ">ខូវ  ឡាយអ៊ូ</option><option value="លីម  គីមឡេង">លីម  គីមឡេង</option><option value="ច័ន្ទ  ​សុខុមវីរៈបុត្រ">ច័ន្ទ  ​សុខុមវីរៈបុត្រ</option><option value="ជួង  ​សិទ្ធិរាជ">ជួង  ​សិទ្ធិរាជ</option><option value="ណាង​  ណយ">ណាង​  ណយ</option><option value="ថាន់  គឹមឡាយ">ថាន់  គឹមឡាយ</option><option value="ថា  គឹមឡុង">ថា  គឹមឡុង</option><option value="​សុខា​  ម៉ាសូជីន">​សុខា​  ម៉ាសូជីន</option><option value="ញ៉ែត សេង">ញ៉ែត សេង</option><option value="ទេព លីហ្សា">ទេព លីហ្សា</option><option value="ទ្រី លីហុង">ទ្រី លីហុង</option><option value="ម៉េង​ កែវពេជ្របូរម៉ី">ម៉េង​​ កែវពេជ្របូរម៉ី</option><option value="វ៉ាត ជីហេង">វ៉ាត ជីហេង</option><option value="តាន់ ឈីងឈីង">តាន់ ឈីងឈីង</option>
+    </div>
+
+    <!-- Modal -->
+    <div id="successModal" class="modal-overlay"><div class="modal-box"><h3>✅ ជោគជ័យ!</h3><p id="modalMessage"></p><button class="modal-btn" onclick="closeModal()">OK (យល់ព្រម)</button></div></div>
+
+    <script>
+        function openTab(evt, tabName) {
+            document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
+            document.querySelectorAll(".tab-btn").forEach(el => { el.classList.remove("active"); el.classList.remove("quiz-active"); });
+            document.getElementById(tabName).style.display = "block";
+            if(tabName === 'quiz-tab') evt.currentTarget.classList.add("quiz-active");
+            else evt.currentTarget.classList.add("active");
+        }
+        function updateStudentList() {
+            let cls = document.getElementById("classSelect").value;
+            let sel = document.getElementById("nameSelect");
+            sel.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះរបស់អ្នក --</option>';
+            sel.innerHTML += document.getElementById(cls === "G10A" ? "names-10A" : "names-10B").innerHTML;
+        }
+        window.onload = updateStudentList;
+        function showModal(msg) { document.getElementById("modalMessage").innerText = msg; document.getElementById("successModal").style.display = "flex"; }
+        function closeModal() { document.getElementById("successModal").style.display = "none"; }
+
+        function submitQuiz() {
+            let cls = document.getElementById('classSelect').value;
+            let name = document.getElementById('nameSelect').value;
+            if (!cls || !name) return alert("សូមជ្រើសរើសឈ្មោះ និងថ្នាក់!");
+            let score = 0, count = 0;
+            for (let i = 1; i <= 5; i++) {
+                let rad = document.getElementsByName('q' + i);
+                for (let r of rad) if (r.checked) { score += parseInt(r.value); count++; break; }
+            }
+            if (count < 5) return alert("សូមឆ្លើយសំណួរឱ្យបានគ្រប់ទាំង ៥!");
+            
+            let btn = document.querySelector('.submit-btn'); btn.innerText = "កំពុងបញ្ជូន..."; btn.disabled = true;
+            
+            // ⚠️ ដាក់ Web App URL ថ្មីនៅទីនេះ ⚠️
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyDNNwB8ytz8sNuul7iYhWRu9FnbAAMumTKQ-3fUUDkmZpSrfFP2M2y3c-JbQymZWHEsg/exec';
+            let fd = new URLSearchParams();
+            fd.append("sheetName", cls); fd.append("name", name); fd.append("score", score); 
+            fd.append("quizNumber", "Q1"); // ចូល Q1 (Column E)
+
+            if(scriptURL.includes('YOUR_GOOGLE')) {
+                alert("សូមដាក់ Web App URL នៅក្នុងកូដជាមុនសិន!");
+                btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; return;
+            }
+            fetch(scriptURL, { method: "POST", body: fd })
+            .then(r => r.text()).then(res => {
+                btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false;
+                if(res === "Success") showModal(`ពិន្ទុរបស់អ្នកទទួលបាន ${score}/50 ពិន្ទុ\nត្រូវបានបញ្ជូនចូលបញ្ជីថ្នាក់ ${cls} រួចរាល់!`);
+                else alert("មានបញ្ហា៖ " + res);
+            }).catch(err => { alert("មានបញ្ហាបណ្តាញទាក់ទង!"); btn.innerText = "បញ្ជូនចម្លើយទៅកាន់គ្រូ"; btn.disabled = false; });
+        }
+
+        // --- SIMULATION LOGIC ---
+        var sH = document.getElementById('sliderH'), sA = document.getElementById('sliderA'), sM1 = document.getElementById('sliderM1'), sM2 = document.getElementById('sliderM2');
+        var tubeBody = document.getElementById('tubeBody'), tubeTopEl = document.getElementById('tubeTopEl'), plateGroup = document.getElementById('plateGroup'), plateEl = document.getElementById('plateEl'), addedMassGroup = document.getElementById('addedMassGroup');
+        var vecFup = document.getElementById('vecFup'), headFup = document.getElementById('headFup'), vecFdown = document.getElementById('vecFdown'), headFdown = document.getElementById('headFdown');
+        var hEnd = document.getElementById('hEnd'), hLine = document.getElementById('hLine'), hArrBot = document.getElementById('hArrBot'), lblH = document.getElementById('lblH');
+        
+        var targetPlateY = 400, currentPlateY = 400, isAnimating = false;
+        var rho = 1000, g = 9.80, waterSurfaceY = 250, pxPerCm = 10, tankBotY = 540;
+
+        function loopAnimation() {
+            var diff = targetPlateY - currentPlateY;
+            if (Math.abs(diff).toFixed(1) !== "0.0") { currentPlateY += diff * 0.15; drawGraphics(); requestAnimationFrame(loopAnimation); } 
+            else { currentPlateY = targetPlateY; drawGraphics(); isAnimating = false; }
+        }
+
+        function drawGraphics() {
+            var h_cm = parseFloat(sH.value), a_cm2 = parseFloat(sA.value);
+            var tubeBotY = waterSurfaceY + (h_cm * pxPerCm), rx = a_cm2 * 2, ry = rx / 4;
+            tubeTopEl.setAttribute("rx", rx); tubeTopEl.setAttribute("ry", ry);
+            tubeBody.setAttribute("d", "M " + (250 - rx) + " 50 L " + (250 - rx) + " " + tubeBotY + " A " + rx + " " + ry + " 0 0 0 " + (250 + rx) + " " + tubeBotY + " L " + (250 + rx) + " 50 Z");
+            
+            plateGroup.setAttribute("transform", "translate(0, " + (currentPlateY - 400) + ")");
+            plateEl.setAttribute("rx", rx + 2); plateEl.setAttribute("ry", ry + 2);
+            addedMassGroup.style.opacity = parseFloat(sM2.value) > 0 ? "1" : "0";
+
+            hEnd.setAttribute("y1", tubeBotY); hEnd.setAttribute("y2", tubeBotY); hLine.setAttribute("y2", tubeBotY);
+            hArrBot.setAttribute("points", "176," + (tubeBotY - 10) + " 184," + (tubeBotY - 10) + " 180," + tubeBotY);
+            lblH.setAttribute("y", waterSurfaceY + (tubeBotY - waterSurfaceY)/2 + 5);
+
+            var m1_kg = parseFloat(sM1.value)/1000, m2_kg = parseFloat(sM2.value)/1000, a_m2 = a_cm2/10000, h_m = h_cm/100;
+            var fDown = (m1_kg + m2_kg) * g, fUp = rho * g * h_m * a_m2;
+            var lenFdown = Math.min((fDown / 5) * 100, 100), lenFup = Math.min((fUp / 5) * 100, 100), vecDY = 410;
+            
+            vecFdown.setAttribute("y2", vecDY + lenFdown); headFdown.setAttribute("points", "245," + (vecDY + lenFdown) + " 255," + (vecDY + lenFdown) + " 250," + (vecDY + lenFdown + 10));
+            vecFup.setAttribute("y2", vecDY - lenFup); headFup.setAttribute("points", "245," + (vecDY - lenFup) + " 255," + (vecDY - lenFup) + " 250," + (vecDY - lenFup - 10));
+        }
+
+        var mathTimeout;
+        function updatePhysics() {
+            var h_cm = parseFloat(sH.value), a_cm2 = parseFloat(sA.value), m1_g = parseFloat(sM1.value), m2_g = parseFloat(sM2.value);
+            document.getElementById('valH').innerText = h_cm.toFixed(1); document.getElementById('valA').innerText = a_cm2.toFixed(1);
+            document.getElementById('valM1').innerText = m1_g; document.getElementById('valM2').innerText = m2_g;
+
+            var m1_kg = m1_g / 1000, m2_kg = m2_g / 1000, a_m2 = a_cm2 / 10000, h_m = h_cm / 100;
+            var fDown = (m1_kg + m2_kg) * g, fUp = rho * g * h_m * a_m2;
+            var hc_cm = ((m1_kg + m2_kg) / (rho * a_m2)) * 100;
+
+            var isFalling = (Math.max(fDown, fUp) === fDown && fDown !== fUp);
+            if (isFalling) {
+                targetPlateY = tankBotY - 10; document.getElementById('liveStatus').innerText = "របូតធ្លាក់"; document.getElementById('liveStatus').style.color = "#d32f2f";
+                document.getElementById('theoryNote').innerHTML = "💡 <strong>សន្និដ្ឋាន៖</strong> កម្លាំងទាញចុះធំជាងកម្លាំងរុញពីទឹក ($F_{down} > F_{up}$) ធ្វើឱ្យបន្ទះ <strong>របូតធ្លាក់ដល់បាត</strong>។";
+            } else {
+                targetPlateY = waterSurfaceY + (h_cm * pxPerCm); document.getElementById('liveStatus').innerText = "ជាប់នឹងបំពង់"; document.getElementById('liveStatus').style.color = "#28a745";
+                document.getElementById('theoryNote').innerHTML = "💡 <strong>សន្និដ្ឋាន៖</strong> កម្លាំងរុញពីទឹកធំជាងកម្លាំងទាញចុះ ($F_{up} > F_{down}$) ធ្វើឱ្យបន្ទះ <strong>ជាប់ស្អិតនឹងបំពង់</strong>។";
+            }
+
+            document.getElementById('liveFup').innerText = fUp.toFixed(2) + " N"; document.getElementById('liveFdown').innerText = fDown.toFixed(2) + " N"; document.getElementById('liveHc').innerText = hc_cm.toFixed(1) + " cm";
+
+            if (!isAnimating) { isAnimating = true; loopAnimation(); }
+
+            clearTimeout(mathTimeout);
+            mathTimeout = setTimeout(function() {
+                document.getElementById('mathLine3').innerHTML = "$$ F_{down} = (m_1 + m_2)g = (" + m1_kg.toFixed(3) + " + " + m2_kg.toFixed(3) + ") \\times 9.80 = " + fDown.toFixed(2) + " \\text{ N} $$";
+                document.getElementById('mathLine4').innerHTML = "$$ F_{up} = \\rho g h A = 1000 \\times 9.80 \\times " + h_m.toFixed(2) + " \\times " + a_m2.toFixed(4) + " = " + fUp.toFixed(2) + " \\text{ N} $$";
+                if (typeof MathJax !== "undefined") { MathJax.typesetClear(); MathJax.typesetPromise(); }
+            }, 300);
+        }
+
+        sH.addEventListener('input', updatePhysics); sA.addEventListener('input', updatePhysics); sM1.addEventListener('input', updatePhysics); sM2.addEventListener('input', updatePhysics);
+        updatePhysics();
+    </script>
+</body>
+</html>
